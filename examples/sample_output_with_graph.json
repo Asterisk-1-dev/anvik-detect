@@ -1,0 +1,1024 @@
+{
+  "dataset_id": "sample_fixture_v1",
+  "generated_at": "2026-10-15T12:00:00Z",
+  "amount_unit": "inr",
+  "count": 3,
+  "meta": {
+    "engine_version": "1.0.0",
+    "scoring_version": "2.0",
+    "config_hash": "sha256:9bbbc333130053d8e2a9cde99a76843db51f8df9140f2eeba0e13e42aab5312c",
+    "rules_run": [
+      "RAPID_ONWARD_TRANSFER",
+      "MULTI_SOURCE_FAN_IN",
+      "FAN_OUT_SPLITTING",
+      "TRANSACTION_CYCLE",
+      "COMPLAINT_CONVERGENCE",
+      "NEW_ACCOUNT_BURST",
+      "COLLECT_REQUEST_ABUSE",
+      "SHARED_DEVICE"
+    ],
+    "rules_skipped": [],
+    "validation_warnings": [],
+    "dropped_rows": {
+      "accounts": 0,
+      "devices": 0,
+      "transactions": 0,
+      "complaints": 0
+    },
+    "graph_schema_version": "1.0",
+    "graph_mode": "both",
+    "total_graph_nodes": 21,
+    "total_graph_edges": 25
+  },
+  "alerts": [
+    {
+      "alert_id": "ALR-0001",
+      "rule_id": "RAPID_ONWARD_TRANSFER",
+      "title": "Rapid Onward Transfer",
+      "priority": "high",
+      "score": 0.8,
+      "created_at": "2026-10-15T12:00:00Z",
+      "account_ids": [
+        "ACC_MULE",
+        "ACC_OUT1"
+      ],
+      "vpas": [
+        "dest1@synpaytm",
+        "mule@synaxis"
+      ],
+      "txn_ids": [
+        "TXN_M1",
+        "TXN_F1"
+      ],
+      "linked_txn_ids": [],
+      "evidence": {
+        "received_inr": 15000.0,
+        "forwarded_inr": 14000.0,
+        "forwarded_pct": 93.33,
+        "gap_minutes": 5.0,
+        "inbound_txn_id": "TXN_M1",
+        "outbound_txn_ids": [
+          "TXN_F1"
+        ],
+        "outbound_receivers": [
+          "ACC_OUT1"
+        ],
+        "score_breakdown": {
+          "scoring_version": "2.0",
+          "sliders": {
+            "forwarded_pct": 0.67,
+            "gap_minutes": 0.67
+          },
+          "suspicion": 0.67,
+          "rule_weight": 1.0,
+          "base_score": 0.8,
+          "family": "PASS_THROUGH",
+          "families_on_focal_accounts": [
+            "PASS_THROUGH"
+          ],
+          "family_bonus": 0.0,
+          "complaint_bonus": 0.0,
+          "floor_applied": false,
+          "final_score": 0.8,
+          "priority": "high"
+        },
+        "calculated_score": 0.8,
+        "calculated_priority": "high"
+      },
+      "explanation": "Account ACC_MULE received ₹15,000.00 and forwarded ₹14,000.00 (93.3%) to 1 downstream counterparty within 5.0 minutes of receipt. This rapid pass-through pattern is consistent with mule layering and warrants review.",
+      "limitations": "Detection is based strictly on transaction timestamps and amounts without account balance context. This alone does not prove misuse.",
+      "alternative_explanations": [
+        "Payment immediately forwarded to a relative, agent, or commercial supplier.",
+        "A business account settling an overdue invoice shortly after receiving customer funds.",
+        "Shared-cost settlement between personal acquaintances."
+      ],
+      "would_clear_if": [
+        "The outbound receiver is verified as a legitimate recurring payee or business partner.",
+        "The inbound sender and recipient provide evidence of a bona fide commercial relationship.",
+        "The forwarded funds constitute an ordinary business cash-flow transit."
+      ],
+      "complaint_ids": [],
+      "related_alert_ids": [
+        "ALR-0002",
+        "ALR-0003"
+      ],
+      "ring_id": "RING-01",
+      "informational_only": false,
+      "graph": {
+        "nodes": [
+          {
+            "id": "ACC_COLL",
+            "type": "account",
+            "role": "origin_account",
+            "label": "Origin account",
+            "vpa": "coll@synicici",
+            "bank": "icici",
+            "accounts_on_device": null,
+            "flagged": false,
+            "alert_ids": []
+          },
+          {
+            "id": "ACC_MULE",
+            "type": "account",
+            "role": "potential_mule",
+            "label": "Potential mule",
+            "vpa": "mule@synaxis",
+            "bank": "axis",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0001"
+            ]
+          },
+          {
+            "id": "ACC_OUT1",
+            "type": "account",
+            "role": "destination_account",
+            "label": "Destination account",
+            "vpa": "dest1@synpaytm",
+            "bank": "paytm",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0001"
+            ]
+          },
+          {
+            "id": "DEV_SHARED_99",
+            "type": "device",
+            "role": "shared_device",
+            "label": "Shared device",
+            "vpa": null,
+            "bank": null,
+            "accounts_on_device": 3,
+            "flagged": false,
+            "alert_ids": []
+          }
+        ],
+        "edges": [
+          {
+            "id": "TXN_M1",
+            "kind": "payment",
+            "source": "ACC_COLL",
+            "target": "ACC_MULE",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 15000.0,
+            "timestamp": "2026-03-01T10:15:00Z",
+            "sequence": 1,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": false,
+            "complaint_ids": [],
+            "alert_ids": [
+              "ALR-0001"
+            ]
+          },
+          {
+            "id": "TXN_F1",
+            "kind": "payment",
+            "source": "ACC_MULE",
+            "target": "ACC_OUT1",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 14000.0,
+            "timestamp": "2026-03-01T10:20:00Z",
+            "sequence": 2,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": false,
+            "complaint_ids": [],
+            "alert_ids": [
+              "ALR-0001"
+            ]
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_COLL",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_COLL",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_MULE",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_MULE",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_OUT1",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_OUT1",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          }
+        ],
+        "truncated": false,
+        "omitted_edges": 0,
+        "disclaimer": "Roles are investigative hypotheses to support review, not findings of wrongdoing."
+      }
+    },
+    {
+      "alert_id": "ALR-0002",
+      "rule_id": "RAPID_ONWARD_TRANSFER",
+      "title": "Rapid Onward Transfer",
+      "priority": "medium",
+      "score": 0.7,
+      "created_at": "2026-10-15T12:00:00Z",
+      "account_ids": [
+        "ACC_COLL",
+        "ACC_MULE"
+      ],
+      "vpas": [
+        "coll@synicici",
+        "mule@synaxis"
+      ],
+      "txn_ids": [
+        "TXN_C1",
+        "TXN_M1"
+      ],
+      "linked_txn_ids": [
+        "TXN_F1"
+      ],
+      "evidence": {
+        "received_inr": 15000.0,
+        "forwarded_inr": 15000.0,
+        "forwarded_pct": 100.0,
+        "gap_minutes": 15.0,
+        "inbound_txn_id": "TXN_C1",
+        "outbound_txn_ids": [
+          "TXN_M1"
+        ],
+        "outbound_receivers": [
+          "ACC_MULE"
+        ],
+        "score_breakdown": {
+          "scoring_version": "2.0",
+          "sliders": {
+            "forwarded_pct": 1.0,
+            "gap_minutes": 0.0
+          },
+          "suspicion": 0.5,
+          "rule_weight": 1.0,
+          "base_score": 0.7,
+          "family": "PASS_THROUGH",
+          "families_on_focal_accounts": [
+            "PASS_THROUGH"
+          ],
+          "family_bonus": 0.0,
+          "complaint_bonus": 0.0,
+          "floor_applied": false,
+          "final_score": 0.7,
+          "priority": "medium"
+        },
+        "calculated_score": 0.7,
+        "calculated_priority": "medium"
+      },
+      "explanation": "Account ACC_COLL received ₹15,000.00 and forwarded ₹15,000.00 (100.0%) to 1 downstream counterparty within 15.0 minutes of receipt. This rapid pass-through pattern is consistent with mule layering and warrants review.",
+      "limitations": "Detection is based strictly on transaction timestamps and amounts without account balance context. This alone does not prove misuse.",
+      "alternative_explanations": [
+        "Payment immediately forwarded to a relative, agent, or commercial supplier.",
+        "A business account settling an overdue invoice shortly after receiving customer funds.",
+        "Shared-cost settlement between personal acquaintances."
+      ],
+      "would_clear_if": [
+        "The outbound receiver is verified as a legitimate recurring payee or business partner.",
+        "The inbound sender and recipient provide evidence of a bona fide commercial relationship.",
+        "The forwarded funds constitute an ordinary business cash-flow transit."
+      ],
+      "complaint_ids": [],
+      "related_alert_ids": [
+        "ALR-0001",
+        "ALR-0003"
+      ],
+      "ring_id": "RING-01",
+      "informational_only": false,
+      "graph": {
+        "nodes": [
+          {
+            "id": "ACC_COLL",
+            "type": "account",
+            "role": "potential_mule",
+            "label": "Potential mule",
+            "vpa": "coll@synicici",
+            "bank": "icici",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0002"
+            ]
+          },
+          {
+            "id": "ACC_MULE",
+            "type": "account",
+            "role": "destination_account",
+            "label": "Destination account",
+            "vpa": "mule@synaxis",
+            "bank": "axis",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0002"
+            ]
+          },
+          {
+            "id": "ACC_OUT1",
+            "type": "account",
+            "role": "linked_account",
+            "label": "Linked account",
+            "vpa": "dest1@synpaytm",
+            "bank": "paytm",
+            "accounts_on_device": null,
+            "flagged": false,
+            "alert_ids": []
+          },
+          {
+            "id": "ACC_VIC",
+            "type": "account",
+            "role": "origin_account",
+            "label": "Origin account",
+            "vpa": "vic@synhdfc",
+            "bank": "hdfc",
+            "accounts_on_device": null,
+            "flagged": false,
+            "alert_ids": []
+          },
+          {
+            "id": "DEV_MOB_01",
+            "type": "device",
+            "role": "origin_device",
+            "label": "Origin device",
+            "vpa": null,
+            "bank": null,
+            "accounts_on_device": 1,
+            "flagged": false,
+            "alert_ids": []
+          },
+          {
+            "id": "DEV_SHARED_99",
+            "type": "device",
+            "role": "shared_device",
+            "label": "Shared device",
+            "vpa": null,
+            "bank": null,
+            "accounts_on_device": 3,
+            "flagged": false,
+            "alert_ids": []
+          }
+        ],
+        "edges": [
+          {
+            "id": "TXN_C1",
+            "kind": "payment",
+            "source": "ACC_VIC",
+            "target": "ACC_COLL",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 15000.0,
+            "timestamp": "2026-03-01T10:00:00Z",
+            "sequence": 1,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": true,
+            "complaint_ids": [
+              "CMP-2026-001"
+            ],
+            "alert_ids": [
+              "ALR-0002"
+            ]
+          },
+          {
+            "id": "TXN_M1",
+            "kind": "payment",
+            "source": "ACC_COLL",
+            "target": "ACC_MULE",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 15000.0,
+            "timestamp": "2026-03-01T10:15:00Z",
+            "sequence": 2,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": false,
+            "complaint_ids": [],
+            "alert_ids": [
+              "ALR-0002"
+            ]
+          },
+          {
+            "id": "TXN_F1",
+            "kind": "payment",
+            "source": "ACC_MULE",
+            "target": "ACC_OUT1",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 14000.0,
+            "timestamp": "2026-03-01T10:20:00Z",
+            "sequence": 3,
+            "is_supporting": false,
+            "direction": "downstream",
+            "reported": false,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_MOB_01-ACC_VIC",
+            "kind": "device_link",
+            "source": "DEV_MOB_01",
+            "target": "ACC_VIC",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_COLL",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_COLL",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_MULE",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_MULE",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_OUT1",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_OUT1",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          }
+        ],
+        "truncated": false,
+        "omitted_edges": 0,
+        "disclaimer": "Roles are investigative hypotheses to support review, not findings of wrongdoing."
+      }
+    },
+    {
+      "alert_id": "ALR-0003",
+      "rule_id": "SHARED_DEVICE",
+      "title": "Shared Device",
+      "priority": "low",
+      "score": 0.2,
+      "created_at": "2026-10-15T12:00:00Z",
+      "account_ids": [
+        "ACC_COLL",
+        "ACC_MULE",
+        "ACC_OUT1"
+      ],
+      "vpas": [
+        "coll@synicici",
+        "dest1@synpaytm",
+        "mule@synaxis"
+      ],
+      "txn_ids": [
+        "TXN_M1",
+        "TXN_F1"
+      ],
+      "linked_txn_ids": [
+        "TXN_C1"
+      ],
+      "evidence": {
+        "device_id": "DEV_SHARED_99",
+        "accounts_on_device": [
+          "ACC_COLL",
+          "ACC_MULE",
+          "ACC_OUT1"
+        ],
+        "observed_transaction_count_per_account": {
+          "ACC_COLL": 1,
+          "ACC_MULE": 1,
+          "ACC_OUT1": 0
+        },
+        "score_breakdown": {
+          "scoring_version": "2.0",
+          "sliders": {},
+          "suspicion": 0.2,
+          "rule_weight": 1.0,
+          "base_score": 0.2,
+          "family": "CONTEXT",
+          "families_on_focal_accounts": [],
+          "family_bonus": 0.0,
+          "complaint_bonus": 0.0,
+          "floor_applied": false,
+          "final_score": 0.2,
+          "priority": "low",
+          "flat_score_applied": true
+        },
+        "calculated_score": 0.2,
+        "calculated_priority": "low"
+      },
+      "explanation": "Device DEV_SHARED_99 is associated with 3 distinct accounts. This shared hardware association provides operational context and warrants review.",
+      "limitations": "Shared devices are common in households and small retail setups and do not indicate misconduct on their own. This alone does not prove misuse.",
+      "alternative_explanations": [
+        "Family members sharing a single household smartphone or tablet.",
+        "A retail store terminal or kiosk used by several authorized cashiers or family business members."
+      ],
+      "would_clear_if": [
+        "Account holders provide proof of shared household address or common business ownership.",
+        "Device usage occurs sequentially within an authorized shared workplace environment."
+      ],
+      "complaint_ids": [],
+      "related_alert_ids": [
+        "ALR-0001",
+        "ALR-0002"
+      ],
+      "ring_id": "RING-01",
+      "informational_only": true,
+      "graph": {
+        "nodes": [
+          {
+            "id": "ACC_COLL",
+            "type": "account",
+            "role": "linked_account",
+            "label": "Linked account",
+            "vpa": "coll@synicici",
+            "bank": "icici",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "ACC_MULE",
+            "type": "account",
+            "role": "linked_account",
+            "label": "Linked account",
+            "vpa": "mule@synaxis",
+            "bank": "axis",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "ACC_OUT1",
+            "type": "account",
+            "role": "linked_account",
+            "label": "Linked account",
+            "vpa": "dest1@synpaytm",
+            "bank": "paytm",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "ACC_VIC",
+            "type": "account",
+            "role": "linked_account",
+            "label": "Linked account",
+            "vpa": "vic@synhdfc",
+            "bank": "hdfc",
+            "accounts_on_device": null,
+            "flagged": false,
+            "alert_ids": []
+          },
+          {
+            "id": "DEV_SHARED_99",
+            "type": "device",
+            "role": "shared_device",
+            "label": "Shared device",
+            "vpa": null,
+            "bank": null,
+            "accounts_on_device": 3,
+            "flagged": false,
+            "alert_ids": []
+          }
+        ],
+        "edges": [
+          {
+            "id": "TXN_C1",
+            "kind": "payment",
+            "source": "ACC_VIC",
+            "target": "ACC_COLL",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 15000.0,
+            "timestamp": "2026-03-01T10:00:00Z",
+            "sequence": 1,
+            "is_supporting": false,
+            "direction": "upstream",
+            "reported": true,
+            "complaint_ids": [
+              "CMP-2026-001"
+            ],
+            "alert_ids": []
+          },
+          {
+            "id": "TXN_M1",
+            "kind": "payment",
+            "source": "ACC_COLL",
+            "target": "ACC_MULE",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 15000.0,
+            "timestamp": "2026-03-01T10:15:00Z",
+            "sequence": 2,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": false,
+            "complaint_ids": [],
+            "alert_ids": [
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "TXN_F1",
+            "kind": "payment",
+            "source": "ACC_MULE",
+            "target": "ACC_OUT1",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 14000.0,
+            "timestamp": "2026-03-01T10:20:00Z",
+            "sequence": 3,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": false,
+            "complaint_ids": [],
+            "alert_ids": [
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_COLL",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_COLL",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_MULE",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_MULE",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_OUT1",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_OUT1",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          }
+        ],
+        "truncated": false,
+        "omitted_edges": 0,
+        "disclaimer": "Roles are investigative hypotheses to support review, not findings of wrongdoing."
+      }
+    }
+  ],
+  "rings": [
+    {
+      "ring_id": "RING-01",
+      "account_ids": [
+        "ACC_COLL",
+        "ACC_MULE",
+        "ACC_OUT1"
+      ],
+      "alert_ids": [
+        "ALR-0001",
+        "ALR-0002",
+        "ALR-0003"
+      ],
+      "highest_priority": "high",
+      "highest_score": 0.8,
+      "graph": {
+        "nodes": [
+          {
+            "id": "ACC_COLL",
+            "type": "account",
+            "role": "potential_mule",
+            "label": "Potential mule",
+            "vpa": "coll@synicici",
+            "bank": "icici",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0001",
+              "ALR-0002",
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "ACC_MULE",
+            "type": "account",
+            "role": "potential_mule",
+            "label": "Potential mule",
+            "vpa": "mule@synaxis",
+            "bank": "axis",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0001",
+              "ALR-0002",
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "ACC_OUT1",
+            "type": "account",
+            "role": "destination_account",
+            "label": "Destination account",
+            "vpa": "dest1@synpaytm",
+            "bank": "paytm",
+            "accounts_on_device": null,
+            "flagged": true,
+            "alert_ids": [
+              "ALR-0001",
+              "ALR-0002",
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "ACC_VIC",
+            "type": "account",
+            "role": "origin_account",
+            "label": "Origin account",
+            "vpa": "vic@synhdfc",
+            "bank": "hdfc",
+            "accounts_on_device": null,
+            "flagged": false,
+            "alert_ids": []
+          },
+          {
+            "id": "DEV_MOB_01",
+            "type": "device",
+            "role": "origin_device",
+            "label": "Origin device",
+            "vpa": null,
+            "bank": null,
+            "accounts_on_device": 1,
+            "flagged": false,
+            "alert_ids": []
+          },
+          {
+            "id": "DEV_SHARED_99",
+            "type": "device",
+            "role": "shared_device",
+            "label": "Shared device",
+            "vpa": null,
+            "bank": null,
+            "accounts_on_device": 3,
+            "flagged": false,
+            "alert_ids": []
+          }
+        ],
+        "edges": [
+          {
+            "id": "TXN_C1",
+            "kind": "payment",
+            "source": "ACC_VIC",
+            "target": "ACC_COLL",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 15000.0,
+            "timestamp": "2026-03-01T10:00:00Z",
+            "sequence": 1,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": true,
+            "complaint_ids": [
+              "CMP-2026-001"
+            ],
+            "alert_ids": [
+              "ALR-0002"
+            ]
+          },
+          {
+            "id": "TXN_M1",
+            "kind": "payment",
+            "source": "ACC_COLL",
+            "target": "ACC_MULE",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 15000.0,
+            "timestamp": "2026-03-01T10:15:00Z",
+            "sequence": 2,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": false,
+            "complaint_ids": [],
+            "alert_ids": [
+              "ALR-0001",
+              "ALR-0002",
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "TXN_F1",
+            "kind": "payment",
+            "source": "ACC_MULE",
+            "target": "ACC_OUT1",
+            "txn_type": "PAY",
+            "status": "SUCCESS",
+            "amount_inr": 14000.0,
+            "timestamp": "2026-03-01T10:20:00Z",
+            "sequence": 3,
+            "is_supporting": true,
+            "direction": "supporting",
+            "reported": false,
+            "complaint_ids": [],
+            "alert_ids": [
+              "ALR-0001",
+              "ALR-0003"
+            ]
+          },
+          {
+            "id": "LNK-DEV_MOB_01-ACC_VIC",
+            "kind": "device_link",
+            "source": "DEV_MOB_01",
+            "target": "ACC_VIC",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_COLL",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_COLL",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_MULE",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_MULE",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          },
+          {
+            "id": "LNK-DEV_SHARED_99-ACC_OUT1",
+            "kind": "device_link",
+            "source": "DEV_SHARED_99",
+            "target": "ACC_OUT1",
+            "txn_type": null,
+            "status": null,
+            "amount_inr": null,
+            "timestamp": null,
+            "sequence": null,
+            "is_supporting": false,
+            "direction": "context",
+            "reported": null,
+            "complaint_ids": [],
+            "alert_ids": []
+          }
+        ],
+        "truncated": false,
+        "omitted_edges": 0,
+        "disclaimer": "Roles are investigative hypotheses to support review, not findings of wrongdoing."
+      }
+    }
+  ],
+  "account_summaries": [
+    {
+      "account_id": "ACC_COLL",
+      "alert_ids": [
+        "ALR-0002",
+        "ALR-0003"
+      ],
+      "highest_priority": "medium",
+      "highest_score": 0.7
+    },
+    {
+      "account_id": "ACC_MULE",
+      "alert_ids": [
+        "ALR-0001",
+        "ALR-0002",
+        "ALR-0003"
+      ],
+      "highest_priority": "high",
+      "highest_score": 0.8
+    },
+    {
+      "account_id": "ACC_OUT1",
+      "alert_ids": [
+        "ALR-0001",
+        "ALR-0003"
+      ],
+      "highest_priority": "high",
+      "highest_score": 0.8
+    }
+  ]
+}

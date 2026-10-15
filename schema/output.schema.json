@@ -1,0 +1,702 @@
+{
+  "$defs": {
+    "AccountSummary": {
+      "additionalProperties": false,
+      "description": "Summary of detection alerts per account.",
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "alert_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alert Ids",
+          "type": "array"
+        },
+        "highest_priority": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "title": "Highest Priority",
+          "type": "string"
+        },
+        "highest_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Highest Score"
+        }
+      },
+      "required": [
+        "account_id",
+        "highest_priority"
+      ],
+      "title": "AccountSummary",
+      "type": "object"
+    },
+    "Alert": {
+      "additionalProperties": false,
+      "description": "Model representing an alert emitted by a detection rule.",
+      "properties": {
+        "alert_id": {
+          "title": "Alert Id",
+          "type": "string"
+        },
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "score": {
+          "title": "Score",
+          "type": "number"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "account_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Account Ids",
+          "type": "array"
+        },
+        "vpas": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Vpas",
+          "type": "array"
+        },
+        "txn_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Txn Ids",
+          "type": "array"
+        },
+        "linked_txn_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Linked Txn Ids",
+          "type": "array"
+        },
+        "evidence": {
+          "additionalProperties": true,
+          "title": "Evidence",
+          "type": "object"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "limitations": {
+          "title": "Limitations",
+          "type": "string"
+        },
+        "alternative_explanations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alternative Explanations",
+          "type": "array"
+        },
+        "would_clear_if": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Would Clear If",
+          "type": "array"
+        },
+        "complaint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Complaint Ids",
+          "type": "array"
+        },
+        "related_alert_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Alert Ids",
+          "type": "array"
+        },
+        "ring_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ring Id"
+        },
+        "informational_only": {
+          "default": false,
+          "title": "Informational Only",
+          "type": "boolean"
+        },
+        "graph": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Graph"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "alert_id",
+        "rule_id",
+        "title",
+        "priority",
+        "score",
+        "created_at",
+        "explanation",
+        "limitations"
+      ],
+      "title": "Alert",
+      "type": "object"
+    },
+    "Graph": {
+      "additionalProperties": false,
+      "description": "Directed transaction-network graph representation.",
+      "properties": {
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/GraphNode"
+          },
+          "title": "Nodes",
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/GraphEdge"
+          },
+          "title": "Edges",
+          "type": "array"
+        },
+        "truncated": {
+          "default": false,
+          "title": "Truncated",
+          "type": "boolean"
+        },
+        "omitted_edges": {
+          "default": 0,
+          "title": "Omitted Edges",
+          "type": "integer"
+        },
+        "disclaimer": {
+          "default": "Roles are investigative hypotheses to support review, not findings of wrongdoing.",
+          "title": "Disclaimer",
+          "type": "string"
+        }
+      },
+      "title": "Graph",
+      "type": "object"
+    },
+    "GraphEdge": {
+      "additionalProperties": false,
+      "description": "A directed edge in the transaction-network graph.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "payment",
+            "device_link",
+            "request_link"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "txn_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Txn Type"
+        },
+        "status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Status"
+        },
+        "amount_inr": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Amount Inr"
+        },
+        "timestamp": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timestamp"
+        },
+        "sequence": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sequence"
+        },
+        "is_supporting": {
+          "default": false,
+          "title": "Is Supporting",
+          "type": "boolean"
+        },
+        "direction": {
+          "enum": [
+            "supporting",
+            "upstream",
+            "downstream",
+            "context"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "reported": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reported"
+        },
+        "complaint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Complaint Ids",
+          "type": "array"
+        },
+        "alert_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alert Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "source",
+        "target",
+        "direction"
+      ],
+      "title": "GraphEdge",
+      "type": "object"
+    },
+    "GraphNode": {
+      "additionalProperties": false,
+      "description": "A node in the directed transaction-network graph.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "account",
+            "device",
+            "collect_request"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "origin_account",
+            "receiving_account",
+            "potential_mule",
+            "destination_account",
+            "linked_account",
+            "shared_device",
+            "origin_device",
+            "collect_request"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "vpa": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vpa"
+        },
+        "bank": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bank"
+        },
+        "accounts_on_device": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accounts On Device"
+        },
+        "flagged": {
+          "default": false,
+          "title": "Flagged",
+          "type": "boolean"
+        },
+        "alert_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alert Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "role",
+        "label"
+      ],
+      "title": "GraphNode",
+      "type": "object"
+    },
+    "Meta": {
+      "additionalProperties": false,
+      "description": "Metadata block for the detection engine run.",
+      "properties": {
+        "engine_version": {
+          "default": "1.0.0",
+          "title": "Engine Version",
+          "type": "string"
+        },
+        "scoring_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "2.0",
+          "title": "Scoring Version"
+        },
+        "config_hash": {
+          "title": "Config Hash",
+          "type": "string"
+        },
+        "rules_run": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Rules Run",
+          "type": "array"
+        },
+        "rules_skipped": {
+          "items": {
+            "$ref": "#/$defs/SkippedRule"
+          },
+          "title": "Rules Skipped",
+          "type": "array"
+        },
+        "validation_warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Validation Warnings",
+          "type": "array"
+        },
+        "dropped_rows": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Dropped Rows",
+          "type": "object"
+        },
+        "graph_schema_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Graph Schema Version"
+        },
+        "graph_mode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Graph Mode"
+        },
+        "total_graph_nodes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Graph Nodes"
+        },
+        "total_graph_edges": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Graph Edges"
+        }
+      },
+      "required": [
+        "config_hash"
+      ],
+      "title": "Meta",
+      "type": "object"
+    },
+    "Ring": {
+      "additionalProperties": false,
+      "description": "Model representing a connected ring of flagged accounts.",
+      "properties": {
+        "ring_id": {
+          "title": "Ring Id",
+          "type": "string"
+        },
+        "account_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Account Ids",
+          "type": "array"
+        },
+        "alert_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alert Ids",
+          "type": "array"
+        },
+        "highest_priority": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "title": "Highest Priority",
+          "type": "string"
+        },
+        "highest_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Highest Score"
+        },
+        "graph": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Graph"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "ring_id",
+        "highest_priority"
+      ],
+      "title": "Ring",
+      "type": "object"
+    },
+    "SkippedRule": {
+      "additionalProperties": false,
+      "description": "Details of a skipped detection rule.",
+      "properties": {
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rule_id",
+        "reason"
+      ],
+      "title": "SkippedRule",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Top-level output schema for RingScope detection engine.",
+  "properties": {
+    "dataset_id": {
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "generated_at": {
+      "title": "Generated At",
+      "type": "string"
+    },
+    "amount_unit": {
+      "default": "inr",
+      "title": "Amount Unit",
+      "type": "string"
+    },
+    "count": {
+      "title": "Count",
+      "type": "integer"
+    },
+    "meta": {
+      "$ref": "#/$defs/Meta"
+    },
+    "alerts": {
+      "items": {
+        "$ref": "#/$defs/Alert"
+      },
+      "title": "Alerts",
+      "type": "array"
+    },
+    "rings": {
+      "items": {
+        "$ref": "#/$defs/Ring"
+      },
+      "title": "Rings",
+      "type": "array"
+    },
+    "account_summaries": {
+      "items": {
+        "$ref": "#/$defs/AccountSummary"
+      },
+      "title": "Account Summaries",
+      "type": "array"
+    }
+  },
+  "required": [
+    "dataset_id",
+    "generated_at",
+    "count",
+    "meta"
+  ],
+  "title": "Output",
+  "type": "object"
+}

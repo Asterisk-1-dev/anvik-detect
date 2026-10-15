@@ -1,0 +1,131 @@
+general:
+  assume_timezone: UTC
+  include_statuses: [SUCCESS]
+  collect_initiator: receiver        # who initiates a COLLECT request
+
+rapid_onward_transfer:
+  enabled: true
+  min_inbound_inr: 1000
+  max_gap_minutes: 15
+  min_forwarded_pct: 80
+  exclude_return_to_sender: true          # outbound to the account that just paid us is a refund, not onward
+  recurring_counterparty_min_prior_txns: 2 # outbound to a receiver we already paid >= N times earlier is treated as recurring, suppressed
+
+multi_source_fan_in:
+  enabled: true
+  window_minutes: 60
+  min_distinct_senders: 8
+  min_first_time_sender_share: 0.7
+  warmup_days: 7
+  baseline_min_prior_active_days: 3
+  baseline_multiplier: 2.0
+
+fan_out_splitting:
+  enabled: true
+  window_minutes: 30
+  min_inbound_inr: 2000
+  min_outgoing_count: 3
+  min_distinct_receivers: 3
+  min_forwarded_pct: 80
+  max_amount_spread_pct: 25                # (max-min)/mean of the outgoing amounts
+
+transaction_cycle:
+  enabled: true
+  min_length: 3
+  max_length: 5
+  max_span_hours: 6
+  min_amount_similarity: 0.8               # min(amount)/max(amount) across the cycle
+  min_amount_inr: 500
+  max_cycles_reported: 200
+
+complaint_convergence:
+  enabled: true
+  max_hops: 3
+  trace_window_hours: 24                   # each hop must happen within this time after the funds arrived
+  min_converging_complaints: 2
+  min_traced_amount_inr: 500
+  trace_method: proportional               # funds are traced proportionally, never counted twice
+
+new_account_burst:
+  enabled: true
+  max_account_age_days: 45
+  min_txns_in_day: 10
+  burst_multiplier_vs_median: 4            # day count must be >= this x median daily count per active account
+  dormant_days: 14                         # optional extra signal: no activity for this long before the burst
+
+collect_request_abuse:
+  enabled: true
+  window_minutes: 120
+  min_collect_txns: 5
+  min_distinct_payers: 4
+  min_collect_share_of_inbound: 0.6
+  include_failed_in_attempts: true
+
+shared_device:
+  enabled: true
+  min_accounts: 3                          # informational only
+  informational_only: true
+
+graph:
+  enabled: true
+  include_devices: true
+  collect_request_as_node: false
+  context_hops: 1
+  context_window_hours: 48
+  max_context_edges: 25
+  max_nodes: 40
+  max_ring_edges: 80
+  max_ring_nodes: 80
+
+scoring:
+  version: "2.0"
+  priority_thresholds: {high: 0.75, medium: 0.45}      # score >= high -> high; >= medium -> medium; else low
+  base_offset: 0.40                                     # score = weight * (base_offset + (1 - base_offset) * suspicion)
+  rule_weights:
+    RAPID_ONWARD_TRANSFER: 1.0
+    MULTI_SOURCE_FAN_IN: 1.0
+    FAN_OUT_SPLITTING: 0.8
+    TRANSACTION_CYCLE: 0.8
+    COMPLAINT_CONVERGENCE: 1.0
+    NEW_ACCOUNT_BURST: 0.6
+    COLLECT_REQUEST_ABUSE: 0.8
+  shared_device_flat_score: 0.20                        # SHARED_DEVICE bypasses the formula
+  complaint_score_floor: 0.50                           # COMPLAINT_CONVERGENCE never scores below this
+  escalation:
+    enabled: true
+    family_bonus_each: 0.10                             # per additional distinct family on the same focal account
+    family_bonus_cap: 0.30
+    complaint_link_bonus: 0.10                          # focal account lies on a complaint trail (not applied to COMPLAINT-family alerts)
+    families:
+      PASS_THROUGH: [RAPID_ONWARD_TRANSFER, FAN_OUT_SPLITTING]
+      INFLOW: [MULTI_SOURCE_FAN_IN, COLLECT_REQUEST_ABUSE]
+      LOOP: [TRANSACTION_CYCLE]
+      COMPLAINT: [COMPLAINT_CONVERGENCE]
+      ACCOUNT_BEHAVIOR: [NEW_ACCOUNT_BURST]
+      CONTEXT: [SHARED_DEVICE]                          # excluded from escalation entirely
+
+sliders:
+  rapid_onward_transfer:
+    forwarded_pct: {low: 80, high: 100}
+    gap_minutes: {cutoff: 15, best: 0}
+  multi_source_fan_in:
+    distinct_senders: {low: 8, high: 20}
+    first_time_share: {low: 0.70, high: 1.00}
+    mix: {count: 0.7, strangers: 0.3}                   # weighted average, weights must sum to 1
+  fan_out_splitting:
+    forwarded_pct: {low: 80, high: 100}
+    amount_spread_pct: {cutoff: 25, best: 0}            # lower spread = more identical pieces
+    outgoing_count: {low: 3, high: 8}
+  transaction_cycle:
+    amount_similarity: {low: 0.80, high: 1.00}
+    span_hours: {cutoff: 6, best: 0}
+  complaint_convergence:
+    complaints: {low: 2, high: 5}
+    traced_inr: {low: 500, high: 50000}
+    avg_hops: {cutoff: 3, best: 1}                      # fewer hops from complaint to account = more suspicious
+  new_account_burst:
+    spike_multiple: {low: 4, high: 20}                  # day count / median daily count
+    dormant_bonus: 0.20
+  collect_request_abuse:
+    requests: {low: 5, high: 15}
+    distinct_payers: {low: 4, high: 10}
